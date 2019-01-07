@@ -4,23 +4,11 @@ mode voice;
 root $root;
 tag-format <semantics/1.0-literals>;
 
-$root = $play $songs $pause ($previous |$random |$replay |$remove | $next | $remove) |
-        $play $songs ($stop |$volumeUp | $volumeDown) |
-        $find $songs ($play | $remove)
+$root = $command;
 
-$play = odtwarzaj | odtwórz | graj | puść;
-$pause = pauza | zastrzymaj;
-$stop = stop | wstrzymaj | wstrzymaj muzykę;
-$next = (następny | następna | przewiń do przodu | pomiń | pomiń utwór | dalej) | $play (kolejny | kolejną | następną | następny);
-$previous = (poprzedni | cofnij | cofnij utwór) | $play (poprzedni | poprzednią);
-$shuffle = (losuj | losuj utwór) | $play losowo;
-$volumeUp = (podgłośnij | głośniej);
-$volumeDown = (ścisz | ciszej);
-$repeat = (powtórz utwór | powtórz | ponownie) | $play ponownie;
-$remove = (usuń utwór | skasuj | usuń);
-$find = (wyszukaj | znajdź | odszukaj);
-
-
-                            $songs = ...
-
+$command = (odtwarzaj | odtwórz | graj | puść) {play} |
+           (pauza | zastrzymaj) {pause} |
+           (stop | wstrzymaj | wstrzymaj muzykę) {stop} |
+           (podgłośnij | głośniej) {volumeUp} |
+           (ścisz | ciszej) {volumeDown} ;
 
