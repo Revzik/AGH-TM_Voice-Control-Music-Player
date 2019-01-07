@@ -1,4 +1,4 @@
-#ABNF 1.0;
+﻿#ABNF 1.0;
 language pl-pl;
 mode voice;
 root $root;
@@ -12,13 +12,11 @@ $play = odtwarzaj | odtwórz | graj | puść;
 $pause = pauza | zastrzymaj;
 $stop = stop | wstrzymaj | wstrzymaj muzykę;
 $next = (następny | następna | przewiń do przodu | pomiń | pomiń utwór | dalej) | $play (kolejny | kolejną | następną | następny);
-$previous = (poprzedni | cofnij | cofnij utwór) | $play (poprzedni | poprzednią);
-$shuffle = (losuj | losuj utwór) | $play losowo;
+$previous = (poprzedni | cofnij | cofnij utwór) ;
 $volumeUp = (podgłośnij | głośniej);
 $volumeDown = (ścisz | ciszej);
-$repeat = (powtórz utwór | powtórz | ponownie) | $play ponownie;
-$remove = (usuń utwór | skasuj | usuń);
-$find = (wyszukaj | znajdź | odszukaj);
+$repeat = (powtórz utwór | powtórz | ponownie);
+
 
 
                             $songs = ...
