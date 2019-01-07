@@ -131,7 +131,7 @@ class MediaPanel(wx.Panel):
     def loadMusic(self, musicFile):
         """"""
         if not self.mediaPlayer.Load(musicFile):
-            wx.MessageBox("Unable to load %s: Unsupported format?" % path,
+            wx.MessageBox("Unable to load %s: Unsupported format?" % musicFile,
                           "ERROR",
                           wx.ICON_ERROR | wx.OK)
         else:
@@ -216,7 +216,7 @@ class MediaPanel(wx.Panel):
         Sets the volume of the music player
         """
         self.currentVolume = self.volumeCtrl.GetValue()
-        print "setting volume to: %s" % int(self.currentVolume)
+        print("setting volume to: %s" % int(self.currentVolume))
         self.mediaPlayer.SetVolume(self.currentVolume)
     
     #----------------------------------------------------------------------
