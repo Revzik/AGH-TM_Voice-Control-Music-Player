@@ -152,7 +152,7 @@ class MediaPanel(wx.Panel):
             defaultDir=self.currentFolder, 
             defaultFile="",
             wildcard=wildcard,
-            style=wx.OPEN | wx.CHANGE_DIR
+            style=wx.FD_OPEN | wx.FD_CHANGE_DIR
             )
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
@@ -215,8 +215,8 @@ class MediaPanel(wx.Panel):
         """
         Sets the volume of the music player
         """
-        self.currentVolume = self.volumeCtrl.GetValue()
-        print("setting volume to: %s" % int(self.currentVolume))
+        self.currentVolume = self.volumeCtrl.GetValue()/100
+        # print("setting volume to: %s" % int(self.currentVolume*100))
         self.mediaPlayer.SetVolume(self.currentVolume)
     
     #----------------------------------------------------------------------
