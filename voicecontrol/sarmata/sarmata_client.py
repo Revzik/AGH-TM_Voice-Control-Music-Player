@@ -8,7 +8,7 @@ from sarmata.service.sarmata_asr_pb2 import ResponseStatus, EMPTY, START_OF_INPU
 from sarmata.utils.audio_source import AudioStream
 from sarmata.utils.mic_source import MicrophoneStream
 import sys
-from voicecontrol.sarmata.SARMATA_CLIENT_VERSION import SARMATA_CLIENT_VERSION
+from sarmata.SARMATA_CLIENT_VERSION import SARMATA_CLIENT_VERSION
 
 
 def print_results(responses, stream):
