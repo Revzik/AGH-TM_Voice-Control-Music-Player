@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from voicecontrol.sarmata.sarmata_client import validate_recognition_settings, create_audio_stream, print_results
-from voicecontrol.sarmata.service.sarmata_settings import SarmataSettings
-from voicecontrol.sarmata.service.sarmata_recognize import SarmataRecognizer
-from voicecontrol.address_provider import AddressProvider
+from sarmata.sarmata_client import validate_recognition_settings, create_audio_stream, print_results
+from sarmata.service.sarmata_settings import SarmataSettings
+from sarmata.service.sarmata_recognize import SarmataRecognizer
+from address_provider import AddressProvider
 from os.path import join as opjoin
 import sys
 

@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from argparse import ArgumentParser
-from voicecontrol.sarmata.service.sarmata_settings import SarmataSettings
-from voicecontrol.sarmata.service.sarmata_recognize import SarmataRecognizer
-from voicecontrol.sarmata.service.sarmata_asr_pb2 import ResponseStatus, EMPTY, START_OF_INPUT
-from voicecontrol.sarmata.utils.audio_source import AudioStream
-from voicecontrol.sarmata.utils.mic_source import MicrophoneStream
+from sarmata.service.sarmata_settings import SarmataSettings
+from sarmata.service.sarmata_recognize import SarmataRecognizer
+from sarmata.service.sarmata_asr_pb2 import ResponseStatus, EMPTY, START_OF_INPUT
+from sarmata.utils.audio_source import AudioStream
+from sarmata.utils.mic_source import MicrophoneStream
 import sys
-from voicecontrol.sarmata.SARMATA_CLIENT_VERSION import SARMATA_CLIENT_VERSION
+from sarmata.SARMATA_CLIENT_VERSION import SARMATA_CLIENT_VERSION
 
 
 def print_results(responses, stream):
