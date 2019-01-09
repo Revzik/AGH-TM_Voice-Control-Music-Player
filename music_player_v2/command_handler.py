@@ -1,7 +1,10 @@
-class CommandHandler:
+from threading import Thread
+import wx
 
-    def __init__(self, panel):
-        self.panel_ = panel
+class CommandHandlerThread(Thread):
+
+    def __init__(self, notify_window):
+        pass
 
     def execute(self, command):
         if command == 'play':
@@ -16,20 +19,23 @@ class CommandHandler:
             self.volumeDown()
 
     def play(self):
-        self.panel_.onPlay()
+        pass
 
     def pause(self):
-        self.panel_.onPause()
+        print("Paused")
+        pass
 
     def stop(self):
-        self.panel_.onStop()
+        pass
+
+    def next(self):
+        pass
+
+    def prev(self):
+        pass
 
     def volumeUp(self):
-        self.panel_.currentVolume += 10
-        if self.panel_.currentVolume > 100:
-            self.panel_.currentVolume = 100
+        volumeOffset = 10
 
     def volumeDown(self):
-        self.panel_.currentVolume -= 10
-        if self.panel_.currentVolume < 0:
-            self.panel_.currentVolume = 0
+        volumeOffset = -10

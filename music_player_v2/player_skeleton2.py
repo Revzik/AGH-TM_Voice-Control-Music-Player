@@ -10,6 +10,7 @@ import os
 import wx
 import wx.media
 import wx.lib.buttons as buttons
+from command_handler import *
 
 dirName = os.path.dirname(os.path.abspath(__file__))
 bitmapDir = os.path.join(dirName, 'bitmaps')
@@ -32,7 +33,9 @@ class MediaPanel(wx.Panel):
         self.currentFolder = sp.GetDocumentsDir()
         self.current_song = 0
         self.file_list = []
-        
+
+        # Work on running command handler
+
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.onTimer)
         self.timer.Start(100)
@@ -290,6 +293,16 @@ class MediaFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, wx.ID_ANY, "Python Music Player")
         panel = MediaPanel(self)
+
+        self.commandHandler = CommandHandlerThread(self)
+
+        self.Bind(wx.EVT_CHAR_HOOK, self.onKeyPress)
+
+    def onKeyPress(self, event):
+        keycode = event.GetKeyCode()
+        if keycode == wx.WXK_SPACE:
+            self.commandHandler.execute("pause")
+        event.Skip()
         
 #----------------------------------------------------------------------
 # Run the program
