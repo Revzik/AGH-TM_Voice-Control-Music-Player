@@ -34,11 +34,21 @@ class MediaPanel(wx.Panel):
         self.current_song = 0
         self.file_list = []
 
-        # Work on running command handler
-
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.onTimer)
         self.timer.Start(100)
+
+        # Running voice recognition
+        self.commandHandler = CommandHandlerThread(self)
+
+        self.Bind(wx.EVT_CHAR_HOOK, self.onKeyPress)
+        self.Bind(V_EVT_PLAY, self.onVoicePlay)
+        self.Bind(V_EVT_PAUSE, self.onVoicePause)
+        self.Bind(V_EVT_STOP, self.onVoiceStop)
+        self.Bind(V_EVT_NEXT, self.onVoiceNext)
+        self.Bind(V_EVT_PREV, self.onVoicePrev)
+        self.Bind(V_EVT_VOL_UP, self.onVoiceVolumeUp)
+        self.Bind(V_EVT_VOL_DN, self.onVoiceVolumeDown)
         
     #----------------------------------------------------------------------
     def layoutControls(self):
@@ -148,25 +158,8 @@ class MediaPanel(wx.Panel):
     #----------------------------------------------------------------------
     def onBrowse(self, event):
         """
-        Opens file dialog to browse for music
+        Opens file dialog to browse for music folder
         """
-        """
-        wildcard = "MP3 (*.mp3)|*.mp3|"     \
-                   "WAV (*.wav)|*.wav"
-        dlg = wx.FileDialog(
-            self, message="Choose a file",
-            defaultDir=self.currentFolder, 
-            defaultFile="",
-            wildcard=wildcard,
-            style=wx.FD_OPEN | wx.FD_CHANGE_DIR
-            )
-        if dlg.ShowModal() == wx.ID_OK:
-            path = dlg.GetPath()
-            self.currentFolder = os.path.dirname(path)
-            self.loadMusic(path)
-        dlg.Destroy()
-        """
-        """ that should be changed so as we choose not a single file to play but whole directory and we create list (with help of os)"""
 
         ddg = wx.DirDialog(
             self, message="Choose a folder in which you have your music stored", defaultPath=self.currentFolder,
@@ -184,7 +177,7 @@ class MediaPanel(wx.Panel):
     #----------------------------------------------------------------------
     def onNext(self, event):
         """
-        Not implemented!
+        Switch to the next song in a folder (needs to be manually restarted)
         """
         self.current_song = self.current_song + 1
         if self.current_song >= len(self.file_list):
@@ -200,8 +193,6 @@ class MediaPanel(wx.Panel):
             self.mediaPlayer.SetInitialSize()
             self.GetSizer().Layout()
             self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
-
-        event.Skip()
 
     #----------------------------------------------------------------------
     def onPause(self):
@@ -233,7 +224,7 @@ class MediaPanel(wx.Panel):
     #----------------------------------------------------------------------
     def onPrev(self, event):
         """
-        Not implemented!
+        Switch to previous song in a folder (needs to be manually restarted)
         """
         self.current_song = self.current_song - 1
         if self.current_song < 0:
@@ -250,8 +241,6 @@ class MediaPanel(wx.Panel):
             self.GetSizer().Layout()
             self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
 
-        event.Skip()
-
     #----------------------------------------------------------------------
     def onSeek(self, event):
         """
@@ -266,9 +255,8 @@ class MediaPanel(wx.Panel):
         """
         Sets the volume of the music player
         """
-        self.currentVolume = self.volumeCtrl.GetValue()/100
-        # print("setting volume to: %s" % int(self.currentVolume*100))
-        self.mediaPlayer.SetVolume(self.currentVolume)
+        self.currentVolume = self.volumeCtrl.GetValue()
+        self.mediaPlayer.SetVolume(self.currentVolume / 100)
     
     #----------------------------------------------------------------------
     def onStop(self, event):
@@ -286,6 +274,104 @@ class MediaPanel(wx.Panel):
         offset = self.mediaPlayer.Tell()
         self.playbackSlider.SetValue(offset)
 
+    #----------------------Voice controll handlers-------------------------
+    def onKeyPress(self, event):
+        """
+        Run voice recognition when spacebar is pressed
+        """
+        keycode = event.GetKeyCode()
+        if keycode == wx.WXK_SPACE:
+            self.commandHandler.recognize()
+
+        event.Skip()
+
+    #----------------------------------------------------------------------
+    def onVoicePlay(self, event):
+        """
+        Play the song when command is received
+        """
+        if not self.mediaPlayer.Play():
+            wx.MessageBox("Unable to Play media : Unsupported format?",
+                          "ERROR",
+                          wx.ICON_ERROR | wx.OK)
+        else:
+            self.mediaPlayer.SetInitialSize()
+            self.GetSizer().Layout()
+            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
+            self.playPauseBtn.SetToggle(True)
+
+    #----------------------------------------------------------------------
+    def onVoicePause(self, event):
+        """
+        Pause current song when command is received
+        """
+        self.mediaPlayer.Pause()
+        self.playPauseBtn.SetToggle(False)
+
+    #----------------------------------------------------------------------
+    def onVoiceStop(self, event):
+        """
+        Stop current song when command is received
+        """
+        self.mediaPlayer.Stop()
+        self.playPauseBtn.SetToggle(False)
+
+    #----------------------------------------------------------------------
+    def onVoiceNext(self, event):
+        """
+        Switch to the next song in a folder when command is received (needs to be manually restarted)
+        """
+        self.current_song = self.current_song + 1
+        if self.current_song >= len(self.file_list):
+            self.current_song = 0
+
+        self.mediaPlayer.Stop()
+        self.loadMusic(os.path.join(self.currentFolder, self.file_list[self.current_song]))
+        if not self.mediaPlayer.Play():
+            wx.MessageBox("Unable to Play media : Unsupported format?",
+                          "ERROR",
+                          wx.ICON_ERROR | wx.OK)
+        else:
+            self.mediaPlayer.SetInitialSize()
+            self.GetSizer().Layout()
+            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
+
+    #----------------------------------------------------------------------
+    def onVoicePrev(self, event):
+        """
+        Switch to previous song in a folder when command is received (needs to be manually restarted)
+        """
+        self.current_song = self.current_song - 1
+        if self.current_song < 0:
+            self.current_song = len(self.file_list) - 1
+
+        self.mediaPlayer.Stop()
+        self.loadMusic(os.path.join(self.currentFolder, self.file_list[self.current_song]))
+        if not self.mediaPlayer.Play():
+            wx.MessageBox("Unable to Play media : Unsupported format?",
+                          "ERROR",
+                          wx.ICON_ERROR | wx.OK)
+        else:
+            self.mediaPlayer.SetInitialSize()
+            self.GetSizer().Layout()
+            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
+
+    #----------------------------------------------------------------------
+    def onVoiceVolumeUp(self, event):
+        self.currentVolume += event.change
+        if self.currentVolume > 100:
+            self.currentVolume = 100
+        self.mediaPlayer.SetVolume(self.currentVolume / 100)
+        self.volumeCtrl.SetValue(self.currentVolume)
+
+    #----------------------------------------------------------------------
+    def onVoiceVolumeDown(self, event):
+        self.currentVolume -= event.chage
+        if self.currentVolume < 0:
+            self.currentVolume = 0
+        self.mediaPlayer.SetVolume(self.currentVolume / 100)
+        self.volumeCtrl.SetValue(self.currentVolume)
+
 ########################################################################
 class MediaFrame(wx.Frame):
  
@@ -293,16 +379,6 @@ class MediaFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, wx.ID_ANY, "Python Music Player")
         panel = MediaPanel(self)
-
-        self.commandHandler = CommandHandlerThread(self)
-
-        self.Bind(wx.EVT_CHAR_HOOK, self.onKeyPress)
-
-    def onKeyPress(self, event):
-        keycode = event.GetKeyCode()
-        if keycode == wx.WXK_SPACE:
-            self.commandHandler.execute("pause")
-        event.Skip()
         
 #----------------------------------------------------------------------
 # Run the program

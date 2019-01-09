@@ -1,9 +1,23 @@
 from threading import Thread
 import wx
+from wx.lib.newevent import NewEvent
+
+EventVPlay, V_EVT_PLAY = NewEvent()
+EventVPause, V_EVT_PAUSE = NewEvent()
+EventVStop, V_EVT_STOP = NewEvent()
+EventVNext, V_EVT_NEXT = NewEvent()
+EventVPrev, V_EVT_PREV = NewEvent()
+EventVVolUp, V_EVT_VOL_UP = NewEvent()
+EventVVolDn, V_EVT_VOL_DN = NewEvent()
 
 class CommandHandlerThread(Thread):
 
     def __init__(self, notify_window):
+        Thread.__init__(self)
+        self.notify_window = notify_window
+        self.start()
+
+    def recognize(self):
         pass
 
     def execute(self, command):
@@ -13,29 +27,34 @@ class CommandHandlerThread(Thread):
             self.pause()
         elif command == 'stop':
             self.stop()
+        elif command == 'next':
+            self.next()
+        elif command == 'prev':
+            self.prev()
         elif command == 'volumeUp':
             self.volumeUp()
         elif command == 'volumeDown':
             self.volumeDown()
 
     def play(self):
-        pass
+        wx.PostEvent(self.notify_window, EventVPlay())
 
     def pause(self):
-        print("Paused")
-        pass
+        wx.PostEvent(self.notify_window, EventVPause())
 
     def stop(self):
-        pass
+        wx.PostEvent(self.notify_window, EventVStop())
 
     def next(self):
-        pass
+        wx.PostEvent(self.notify_window, EventVNext())
 
     def prev(self):
-        pass
+        wx.PostEvent(self.notify_window, EventVPrev())
 
     def volumeUp(self):
-        volumeOffset = 10
+        offset = 10
+        wx.PostEvent(self.notify_window, EventVVolUp(change=offset))
 
     def volumeDown(self):
-        volumeOffset = -10
+        offset = -10
+        wx.PostEvent(self.notify_window, EventVVolDn(change=offset))
