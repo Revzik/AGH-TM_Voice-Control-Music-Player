@@ -15,7 +15,7 @@ class SarmataArgs:
     grammar_name = ''                   # Name (ID) of the grammar in the service's grammar cache.
     grammar = None                      # SRGS grammar file (ABNF or XML format accepted).
     max_alternatives = 3                # Maximum number of recognition hypotheses to be returned.
-    mic = False                         # Use microphone as an audio source (instead of wave file).
+    mic = True                          # Use microphone as an audio source (instead of wave file).
     no_input_timeout = 5000             # MRCP v2 no input timeout [ms].
     no_match_threshold = 0.2            # Confidence acceptance threshold.
     recognition_timeout = 10000         # MRCP v2 recognition timeout [ms].
@@ -23,7 +23,7 @@ class SarmataArgs:
     service_settings = None             # Semicolon-separated list of key=value pairs defining settings to be sent to service via gRPC request.
     speech_complete_timeout = 5000      # MRCP v2 speech complete timeout [ms].
     speech_incomplete_timeout = 3000    # MRCP v2 speech incomplete timeout [ms].
-    wave = None                         # Path to wave file with speech to be recognized. Should be mono, 8kHz or 16kHz.
+    wave = None
 
     def __init__(self, wav_filepath=None, grammar=None):
         ap = AddressProvider()
@@ -35,9 +35,9 @@ class SarmataArgs:
 
 
 if __name__ == '__main__':
-    wave_file = "waves/example_play.wav"
+
     grammar_file = "grammars/commands.abnf"
-    args = SarmataArgs(wave_file, grammar_file)
+    args = SarmataArgs(grammar= grammar_file)
 
     settings = SarmataSettings()
     settings.process_args(args)  # load settings from cmd
