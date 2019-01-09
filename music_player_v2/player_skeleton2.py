@@ -30,6 +30,8 @@ class MediaPanel(wx.Panel):
         
         sp = wx.StandardPaths.Get()
         self.currentFolder = sp.GetDocumentsDir()
+        self.current_song = 0
+        self.file_list = []
         
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.onTimer)
@@ -145,6 +147,7 @@ class MediaPanel(wx.Panel):
         """
         Opens file dialog to browse for music
         """
+        """
         wildcard = "MP3 (*.mp3)|*.mp3|"     \
                    "WAV (*.wav)|*.wav"
         dlg = wx.FileDialog(
@@ -159,14 +162,44 @@ class MediaPanel(wx.Panel):
             self.currentFolder = os.path.dirname(path)
             self.loadMusic(path)
         dlg.Destroy()
-            
+        """
+        """ that should be changed so as we choose not a single file to play but whole directory and we create list (with help of os)"""
+
+        ddg = wx.DirDialog(
+            self, message="Choose a folder in which you have your music stored", defaultPath=self.currentFolder,
+            style=wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST
+         )
+
+        if ddg.ShowModal() == wx.ID_OK:
+            self.currentFolder = ddg.GetPath()
+            for fname in os.listdir(self.currentFolder):  # os.listdir returns the list of files in the currentFolder given in brackets
+                if fname.endswith('.mp3') or fname.endswith('.wav'):
+                    self.file_list.append(fname)
+            self.loadMusic(os.path.join(self.currentFolder, self.file_list[self.current_song]))
+        ddg.Destroy()
+
     #----------------------------------------------------------------------
     def onNext(self, event):
         """
         Not implemented!
         """
-        pass
-    
+        self.current_song = self.current_song + 1
+        if self.current_song >= len(self.file_list):
+            self.current_song = 0
+
+        self.mediaPlayer.Stop()
+        self.loadMusic(os.path.join(self.currentFolder, self.file_list[self.current_song]))
+        if not self.mediaPlayer.Play():
+            wx.MessageBox("Unable to Play media : Unsupported format?",
+                          "ERROR",
+                          wx.ICON_ERROR | wx.OK)
+        else:
+            self.mediaPlayer.SetInitialSize()
+            self.GetSizer().Layout()
+            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
+
+        event.Skip()
+
     #----------------------------------------------------------------------
     def onPause(self):
         """
@@ -199,8 +232,23 @@ class MediaPanel(wx.Panel):
         """
         Not implemented!
         """
-        pass
-    
+        self.current_song = self.current_song - 1
+        if self.current_song < 0:
+            self.current_song = len(self.file_list) - 1
+
+        self.mediaPlayer.Stop()
+        self.loadMusic(os.path.join(self.currentFolder, self.file_list[self.current_song]))
+        if not self.mediaPlayer.Play():
+            wx.MessageBox("Unable to Play media : Unsupported format?",
+                          "ERROR",
+                          wx.ICON_ERROR | wx.OK)
+        else:
+            self.mediaPlayer.SetInitialSize()
+            self.GetSizer().Layout()
+            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
+
+        event.Skip()
+
     #----------------------------------------------------------------------
     def onSeek(self, event):
         """
