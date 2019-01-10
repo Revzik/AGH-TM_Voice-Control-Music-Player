@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from sarmata.sarmata_client import validate_recognition_settings, create_audio_stream, print_results
-from sarmata.service.sarmata_settings import SarmataSettings
-from sarmata.service.sarmata_recognize import SarmataRecognizer
-from address_provider import AddressProvider
+from .sarmata.sarmata_client import validate_recognition_settings, create_audio_stream, print_results
+from .sarmata.service.sarmata_settings import SarmataSettings
+from .sarmata.service.sarmata_recognize import SarmataRecognizer
+from .address_provider import AddressProvider
 from os.path import join as opjoin
 import sys
 
@@ -34,9 +34,9 @@ class SarmataArgs:
         self.address = ap.get("sarmata")
 
 
-if __name__ == '__main__':
+def runSarmata():
 
-    grammar_file = "grammars/commands.abnf"
+    grammar_file = "voicecontrol/grammars/commands.abnf"
     args = SarmataArgs(grammar= grammar_file)
 
     settings = SarmataSettings()
@@ -75,4 +75,4 @@ if __name__ == '__main__':
             settings.set_session_id(session_id)
 
             results = recognizer.recognize(stream, settings)
-            print_results(results, stream)
+            return print_results(results, stream)
