@@ -21,7 +21,7 @@ class SarmataArgs:
     recognition_timeout = 10000         # MRCP v2 recognition timeout [ms].
     session_id = None                   # Session ID to be passed to the service. If not specified, the service will generate a default session ID itself.
     service_settings = None             # Semicolon-separated list of key=value pairs defining settings to be sent to service via gRPC request.
-    speech_complete_timeout = 5000      # MRCP v2 speech complete timeout [ms].
+    speech_complete_timeout = 2000      # MRCP v2 speech complete timeout [ms].
     speech_incomplete_timeout = 3000    # MRCP v2 speech incomplete timeout [ms].
     wave = None
 

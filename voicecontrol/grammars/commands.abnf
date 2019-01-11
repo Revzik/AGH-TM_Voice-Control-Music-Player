@@ -9,8 +9,8 @@ $root = $command;
 $command = (odtwarzaj | odtwórz | graj | puść) {play} |
            (pauza | zastrzymaj) {pause} |
            (stop | wstrzymaj | wstrzymaj muzykę) {stop} |
-           (następny, pomiń) {next} |
-           (poprzedni, wróć, cofnij) {prev} |
+           (następny | pomiń) {next} |
+           (poprzedni | wróć | cofnij) {prev} |
            (podgłośnij | głośniej) {volumeUp} |
            (ścisz | ciszej) {volumeDown} ;
 
