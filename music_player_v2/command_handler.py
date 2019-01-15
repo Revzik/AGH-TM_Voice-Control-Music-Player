@@ -1,7 +1,7 @@
 from threading import Thread
 import wx
 from wx.lib.newevent import NewEvent
-from ..voicecontrol.run_sarmata import runSarmata
+from voicecontrol.run_sarmata import runSarmata
 
 EventVPlay, V_EVT_PLAY = NewEvent()
 EventVPause, V_EVT_PAUSE = NewEvent()

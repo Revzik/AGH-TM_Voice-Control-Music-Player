@@ -2,19 +2,19 @@
 # -*- coding: utf-8 -*-
 
 from argparse import ArgumentParser
-from sarmata.service.sarmata_settings import SarmataSettings
-from sarmata.service.sarmata_recognize import SarmataRecognizer
-from sarmata.service.sarmata_asr_pb2 import ResponseStatus, EMPTY, START_OF_INPUT
-from sarmata.utils.audio_source import AudioStream
-from sarmata.utils.mic_source import MicrophoneStream
+from .service.sarmata_settings import SarmataSettings
+from .service.sarmata_recognize import SarmataRecognizer
+from .service.sarmata_asr_pb2 import ResponseStatus, EMPTY, START_OF_INPUT
+from .utils.audio_source import AudioStream
+from .utils.mic_source import MicrophoneStream
 import sys
-from sarmata.SARMATA_CLIENT_VERSION import SARMATA_CLIENT_VERSION
+from .SARMATA_CLIENT_VERSION import SARMATA_CLIENT_VERSION
 
 
 def print_results(responses, stream):
     if responses is None:
         print("Empty results - None object")
-        return
+        return False
 
     for response in responses:
         if response is None:
@@ -37,6 +37,7 @@ def print_results(responses, stream):
         n = 1
         for res in response.results:
             transcript = " ".join([word.transcript for word in res.words])
+            return res.semantic_interpretation
             print("[{}.] {} /{}/ ({})".format(n, transcript, res.semantic_interpretation, res.confidence))
             n += 1
 
