@@ -389,7 +389,7 @@ class MediaPanel(wx.Panel):
             self.GetSizer().Layout()
             self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
 
-    #----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
     def onVoicePrev(self, event):
         """
         Switch to previous song in a folder when command is received (needs to be manually restarted)
