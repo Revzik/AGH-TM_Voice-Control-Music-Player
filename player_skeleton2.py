@@ -9,6 +9,7 @@
 import os
 import wx
 import wx.media
+import random
 import wx.lib.buttons as buttons
 from command_handler import *
 
@@ -95,6 +96,10 @@ class MediaPanel(wx.Panel):
         self.buildBtn({'bitmap':'player_prev.png', 'handler':self.onPrev,
                        'name':'prev'},
                       audioBarSizer)
+
+        self.buildBtn({'bitmap': 'player_random.png', 'handler': self.onRandom,
+                       'name': 'random'},
+                      audioBarSizer)
         
         # create play/pause toggle button
         img = wx.Bitmap(os.path.join(bitmapDir, "player_play.png"))
@@ -171,7 +176,7 @@ class MediaPanel(wx.Panel):
             for fname in os.listdir(self.currentFolder):  # os.listdir returns the list of files in the currentFolder given in brackets
                 if fname.endswith('.mp3') or fname.endswith('.wav'):
                     self.file_list.append(fname)
-            self.loadMusic(os.path.join(self.currentFolder, self.file_list[self.current_song]))
+                self.loadMusic(os.path.join(self.currentFolder, self.file_list[self.current_song]))
         ddg.Destroy()
 
     #----------------------------------------------------------------------
@@ -230,8 +235,33 @@ class MediaPanel(wx.Panel):
         if self.current_song < 0:
             self.current_song = len(self.file_list) - 1
 
-        self.mediaPlayer.Stop()
+        self.mediaPlayer.Pause()
         self.loadMusic(os.path.join(self.currentFolder, self.file_list[self.current_song]))
+
+        if not self.mediaPlayer.Play():
+            wx.MessageBox("Unable to Play media : Unsupported format?",
+                          "ERROR",
+                          wx.ICON_ERROR | wx.OK)
+        else:
+            self.mediaPlayer.SetInitialSize()
+            self.GetSizer().Layout()
+            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
+
+        event.Skip()
+
+    def onRandom(self, event):
+        """
+        Not implemented!
+        """
+
+        random.shuffle(self.file_list)
+
+       # if self.current_song < 0:
+        #    self.current_song = len(self.file_list) - 1
+
+        self.mediaPlayer.Pause()
+        self.loadMusic(os.path.join(self.currentFolder, self.file_list[self.current_song]))
+
         if not self.mediaPlayer.Play():
             wx.MessageBox("Unable to Play media : Unsupported format?",
                           "ERROR",
