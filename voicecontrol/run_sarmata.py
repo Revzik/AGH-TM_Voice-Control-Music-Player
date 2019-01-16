@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from sarmata.sarmata_client import validate_recognition_settings, create_audio_stream, print_results
-from sarmata.service.sarmata_settings import SarmataSettings
-from sarmata.service.sarmata_recognize import SarmataRecognizer
-from address_provider import AddressProvider
+from .sarmata.sarmata_client import validate_recognition_settings, create_audio_stream, print_results
+from .sarmata.service.sarmata_settings import SarmataSettings
+from .sarmata.service.sarmata_recognize import SarmataRecognizer
+from .address_provider import AddressProvider
 from os.path import join as opjoin
 import sys
 
@@ -21,7 +21,7 @@ class SarmataArgs:
     recognition_timeout = 10000         # MRCP v2 recognition timeout [ms].
     session_id = None                   # Session ID to be passed to the service. If not specified, the service will generate a default session ID itself.
     service_settings = None             # Semicolon-separated list of key=value pairs defining settings to be sent to service via gRPC request.
-    speech_complete_timeout = 5000      # MRCP v2 speech complete timeout [ms].
+    speech_complete_timeout = 2000      # MRCP v2 speech complete timeout [ms].
     speech_incomplete_timeout = 3000    # MRCP v2 speech incomplete timeout [ms].
     wave = None
 
@@ -34,9 +34,9 @@ class SarmataArgs:
         self.address = ap.get("sarmata")
 
 
-if __name__ == '__main__':
+def runSarmata():
 
-    grammar_file = "grammars/commands.abnf"
+    grammar_file = "voicecontrol/grammars/commands.abnf"
     args = SarmataArgs(grammar= grammar_file)
 
     settings = SarmataSettings()
@@ -75,4 +75,4 @@ if __name__ == '__main__':
             settings.set_session_id(session_id)
 
             results = recognizer.recognize(stream, settings)
-            print_results(results, stream)
+            return print_results(results, stream)

@@ -1,7 +1,7 @@
 from threading import Thread
 import wx
 from wx.lib.newevent import NewEvent
-from voicecontrol import run_sarmata
+from voicecontrol.run_sarmata import runSarmata
 
 EventVPlay, V_EVT_PLAY = NewEvent()
 EventVPause, V_EVT_PAUSE = NewEvent()
@@ -11,6 +11,7 @@ EventVPrev, V_EVT_PREV = NewEvent()
 EventVVolUp, V_EVT_VOL_UP = NewEvent()
 EventVVolDn, V_EVT_VOL_DN = NewEvent()
 
+
 class CommandHandlerThread(Thread):
 
     def __init__(self, notify_window):
@@ -19,7 +20,7 @@ class CommandHandlerThread(Thread):
         self.start()
 
     def recognize(self):
-        pass
+        self.execute(runSarmata())
 
     def execute(self, command):
         if command == 'play':

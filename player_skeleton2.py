@@ -1,4 +1,4 @@
-#----------------------------------------------------------------------
+ #----------------------------------------------------------------------
 # player_skeleton2.py
 #
 # Created: 04/15/2010
@@ -396,7 +396,7 @@ class MediaPanel(wx.Panel):
 
     #----------------------------------------------------------------------
     def onVoiceVolumeDown(self, event):
-        self.currentVolume -= event.chage
+        self.currentVolume -= event.change
         if self.currentVolume < 0:
             self.currentVolume = 0
         self.mediaPlayer.SetVolume(self.currentVolume / 100)
