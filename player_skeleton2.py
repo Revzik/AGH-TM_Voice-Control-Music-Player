@@ -47,6 +47,7 @@ class MediaPanel(wx.Panel):
         self.Bind(V_EVT_PAUSE, self.onVoicePause)
         self.Bind(V_EVT_STOP, self.onVoiceStop)
         self.Bind(V_EVT_NEXT, self.onVoiceNext)
+        self.Bind(V_EVT_RAND, self.onVoiceRandom)
         self.Bind(V_EVT_PREV, self.onVoicePrev)
         self.Bind(V_EVT_VOL_UP, self.onVoiceVolumeUp)
         self.Bind(V_EVT_VOL_DN, self.onVoiceVolumeDown)
@@ -249,6 +250,7 @@ class MediaPanel(wx.Panel):
 
         event.Skip()
 
+    #----------------------------------------------------------------------
     def onRandom(self, event):
         """
         Not implemented!
@@ -367,6 +369,24 @@ class MediaPanel(wx.Panel):
             self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
 
     #----------------------------------------------------------------------
+    def onVoiceRandom(self, event):
+
+        random.shuffle(self.file_list)
+
+        self.mediaPlayer.Pause()
+        self.loadMusic(os.path.join(self.currentFolder, self.file_list[self.current_song]))
+
+        if not self.mediaPlayer.Play():
+            wx.MessageBox("Unable to Play media : Unsupported format?",
+                          "ERROR",
+                          wx.ICON_ERROR | wx.OK)
+        else:
+            self.mediaPlayer.SetInitialSize()
+            self.GetSizer().Layout()
+            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
+
+
+    # ----------------------------------------------------------------------
     def onVoicePrev(self, event):
         """
         Switch to previous song in a folder when command is received (needs to be manually restarted)

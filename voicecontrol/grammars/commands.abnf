@@ -12,5 +12,6 @@ $command = (odtwarzaj | odtwórz | graj | puść) {play} |
            (następny | pomiń) {next} |
            (poprzedni | wróć | cofnij) {prev} |
            (podgłośnij | głośniej) {volumeUp} |
-           (ścisz | ciszej) {volumeDown} ;
+           (ścisz | ciszej) {volumeDown} |
+           (losuj | wylosuj | losowo) {random};
 
