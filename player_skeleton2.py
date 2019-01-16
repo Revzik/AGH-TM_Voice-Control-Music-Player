@@ -48,8 +48,9 @@ class MediaPanel(wx.Panel):
         self.Bind(V_EVT_STOP, self.onVoiceStop)
         self.Bind(V_EVT_NEXT, self.onVoiceNext)
         self.Bind(V_EVT_PREV, self.onVoicePrev)
-        self.Bind(V_EVT_VOL_UP, self.onVoiceVolumeUp)
-        self.Bind(V_EVT_VOL_DN, self.onVoiceVolumeDown)
+        self.Bind(V_EVT_RND_OFF, self.onVoiceRandomOff)
+        self.Bind(V_EVT_RND_ON, self.onVoiceRandomOn)
+        self.Bind(V_EVT_VOL, self.onVoiceVolumeChange)
         
     #----------------------------------------------------------------------
     def layoutControls(self):
@@ -97,9 +98,16 @@ class MediaPanel(wx.Panel):
                        'name':'prev'},
                       audioBarSizer)
 
-        self.buildBtn({'bitmap': 'player_random.png', 'handler': self.onRandom,
-                       'name': 'random'},
-                      audioBarSizer)
+        img = wx.Bitmap(os.path.join(bitmapDir, "player_random.png"))
+        self.randomBtn = buttons.GenBitmapToggleButton(self, bitmap=img, name="random")
+        self.randomBtn.Enable(True)
+
+        img = wx.Bitmap(os.path.join(bitmapDir, "player_random.png"))
+        self.randomBtn.SetBitmapSelected(img)
+        self.randomBtn.SetInitialSize()
+
+        self.randomBtn.Bind(wx.EVT_BUTTON, self.onRandomOn)
+        audioBarSizer.Add(self.randomBtn, 0, wx.LEFT, 2)
         
         # create play/pause toggle button
         img = wx.Bitmap(os.path.join(bitmapDir, "player_play.png"))
@@ -249,27 +257,24 @@ class MediaPanel(wx.Panel):
 
         event.Skip()
 
-    def onRandom(self, event):
+    #----------------------------------------------------------------------
+    def onRandomOff(self):
         """
-        Not implemented!
+        Sorts the playlist
         """
+        sorted(self.file_list)
+
+    #----------------------------------------------------------------------
+    def onRandomOn(self, event):
+        """
+        Shuffles the playlist.
+        """
+
+        if not event.GetIsDown():
+            self.onRandomOff()
+            return
 
         random.shuffle(self.file_list)
-
-       # if self.current_song < 0:
-        #    self.current_song = len(self.file_list) - 1
-
-        self.mediaPlayer.Pause()
-        self.loadMusic(os.path.join(self.currentFolder, self.file_list[self.current_song]))
-
-        if not self.mediaPlayer.Play():
-            wx.MessageBox("Unable to Play media : Unsupported format?",
-                          "ERROR",
-                          wx.ICON_ERROR | wx.OK)
-        else:
-            self.mediaPlayer.SetInitialSize()
-            self.GetSizer().Layout()
-            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
 
     #----------------------------------------------------------------------
     def onSeek(self, event):
@@ -339,6 +344,24 @@ class MediaPanel(wx.Panel):
         self.playPauseBtn.SetToggle(False)
 
     #----------------------------------------------------------------------
+    def onVoiceRandomOff(self, event):
+        """
+        Sorts the playlist when command is received
+        """
+        if self.randomBtn.GetValue():
+            sorted(self.file_list)
+            self.randomBtn.SetValue(False)
+
+    #----------------------------------------------------------------------
+    def onVoiceRandomOn(self, event):
+        """
+        Sorts the playlist when command is received
+        """
+        if not self.randomBtn.GetValue():
+            random.shuffle(self.file_list)
+            self.randomBtn.SetValue(True)
+
+    #----------------------------------------------------------------------
     def onVoiceStop(self, event):
         """
         Stop current song when command is received
@@ -387,17 +410,11 @@ class MediaPanel(wx.Panel):
             self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
 
     #----------------------------------------------------------------------
-    def onVoiceVolumeUp(self, event):
+    def onVoiceVolumeChange(self, event):
         self.currentVolume += event.change
         if self.currentVolume > 100:
             self.currentVolume = 100
-        self.mediaPlayer.SetVolume(self.currentVolume / 100)
-        self.volumeCtrl.SetValue(self.currentVolume)
-
-    #----------------------------------------------------------------------
-    def onVoiceVolumeDown(self, event):
-        self.currentVolume -= event.change
-        if self.currentVolume < 0:
+        elif self.currentVolume < 0:
             self.currentVolume = 0
         self.mediaPlayer.SetVolume(self.currentVolume / 100)
         self.volumeCtrl.SetValue(self.currentVolume)

@@ -6,11 +6,17 @@ tag-format <semantics/1.0-literals>;
 
 $root = $command;
 
-$command = (odtwarzaj | odtwórz | graj | puść) {play} |
+$command = (odtwarzaj | odtwórz | graj | puść | plej) {play} |
            (pauza | zastrzymaj) {pause} |
            (stop | wstrzymaj | wstrzymaj muzykę) {stop} |
            (następny | pomiń) {next} |
            (poprzedni | wróć | cofnij) {prev} |
+           (wyłącz losowanie) {randomOff} |
+           (włącz losowanie) {randomOn} |
+           (podgłośnij trochę | trochę głośniej |
+            podgłośnij odrobinę | odrobinę głośniej) {volumeUpSlight} |
+           (ścisz trochę | trochę ciszej |
+            ścisz odrobinę | odrobinę ciszej){volumeDownSlight} |
            (podgłośnij | głośniej) {volumeUp} |
            (ścisz | ciszej) {volumeDown} ;
 

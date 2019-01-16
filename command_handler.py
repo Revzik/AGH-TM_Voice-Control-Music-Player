@@ -8,8 +8,9 @@ EventVPause, V_EVT_PAUSE = NewEvent()
 EventVStop, V_EVT_STOP = NewEvent()
 EventVNext, V_EVT_NEXT = NewEvent()
 EventVPrev, V_EVT_PREV = NewEvent()
-EventVVolUp, V_EVT_VOL_UP = NewEvent()
-EventVVolDn, V_EVT_VOL_DN = NewEvent()
+EventVRandomOff, V_EVT_RND_OFF = NewEvent()
+EventVRandomOn, V_EVT_RND_ON = NewEvent()
+EventVVolChange, V_EVT_VOL = NewEvent()
 
 
 class CommandHandlerThread(Thread):
@@ -33,10 +34,18 @@ class CommandHandlerThread(Thread):
             self.next()
         elif command == 'prev':
             self.prev()
+        elif command == 'randomOff':
+            self.randomOff()
+        elif command == 'randomOn':
+            self.randomOn()
+        elif command == 'volumeUpSlight':
+            self.volumeChange(5)
+        elif command == 'volumeDownSlight':
+            self.volumeChange(-5)
         elif command == 'volumeUp':
-            self.volumeUp()
+            self.volumeChange(20)
         elif command == 'volumeDown':
-            self.volumeDown()
+            self.volumeChange(-20)
 
     def play(self):
         wx.PostEvent(self.notify_window, EventVPlay())
@@ -53,10 +62,11 @@ class CommandHandlerThread(Thread):
     def prev(self):
         wx.PostEvent(self.notify_window, EventVPrev())
 
-    def volumeUp(self):
-        offset = 10
-        wx.PostEvent(self.notify_window, EventVVolUp(change=offset))
+    def randomOff(self):
+        wx.PostEvent(self.notify_window, EventVRandomOff())
 
-    def volumeDown(self):
-        offset = -10
-        wx.PostEvent(self.notify_window, EventVVolDn(change=offset))
+    def randomOn(self):
+        wx.PostEvent(self.notify_window, EventVRandomOn())
+
+    def volumeChange(self, offset):
+        wx.PostEvent(self.notify_window, EventVVolChange(change=offset))
