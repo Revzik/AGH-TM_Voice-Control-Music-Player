@@ -205,22 +205,14 @@ class MediaPanel(wx.Panel):
             self.current_song = 0
 
         self.mediaPlayer.Stop()
+        self.playPauseBtn.SetToggle(False)
 
         if not self.mediaPlayer.Load(os.path.join(self.currentFolder, self.file_list[self.current_song])):
             wx.MessageBox("Unable to load %s: Unsupported format?"
                           % os.path.join(self.currentFolder, self.file_list[self.current_song]),
                           "ERROR",
                           wx.ICON_ERROR | wx.OK)
-
-        if not self.mediaPlayer.Play():
-            wx.MessageBox("Unable to Play media : Unsupported format?",
-                          "ERROR",
-                          wx.ICON_ERROR | wx.OK)
-        else:
-            self.mediaPlayer.SetInitialSize()
-            self.GetSizer().Layout()
-            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
-            if self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
+        elif self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
                 self.songLabel.SetLabelText(self.file_list[self.current_song][:-4])
                 self.GetSizer().Layout()
 
@@ -261,22 +253,14 @@ class MediaPanel(wx.Panel):
             self.current_song = len(self.file_list) - 1
 
         self.mediaPlayer.Stop()
+        self.playPauseBtn.SetToggle(False)
 
         if not self.mediaPlayer.Load(os.path.join(self.currentFolder, self.file_list[self.current_song])):
             wx.MessageBox("Unable to load %s: Unsupported format?"
                           % os.path.join(self.currentFolder, self.file_list[self.current_song]),
                           "ERROR",
                           wx.ICON_ERROR | wx.OK)
-
-        if not self.mediaPlayer.Play():
-            wx.MessageBox("Unable to Play media : Unsupported format?",
-                          "ERROR",
-                          wx.ICON_ERROR | wx.OK)
-        else:
-            self.mediaPlayer.SetInitialSize()
-            self.GetSizer().Layout()
-            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
-            if self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
+        elif self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
                 self.songLabel.SetLabelText(self.file_list[self.current_song][:-4])
                 self.GetSizer().Layout()
 
@@ -285,7 +269,7 @@ class MediaPanel(wx.Panel):
         """
         Sorts the playlist
         """
-        sorted(self.file_list)
+        self.file_list = sorted(self.file_list)
 
     #----------------------------------------------------------------------
     def onRandomOn(self, event):
@@ -372,7 +356,7 @@ class MediaPanel(wx.Panel):
         Sorts the playlist when command is received
         """
         if self.randomBtn.GetValue():
-            sorted(self.file_list)
+            self.file_list = sorted(self.file_list)
             self.randomBtn.SetValue(False)
 
     #----------------------------------------------------------------------
@@ -402,22 +386,14 @@ class MediaPanel(wx.Panel):
             self.current_song = 0
 
         self.mediaPlayer.Stop()
+        self.playPauseBtn.SetToggle(False)
 
         if not self.mediaPlayer.Load(os.path.join(self.currentFolder, self.file_list[self.current_song])):
             wx.MessageBox("Unable to load %s: Unsupported format?"
                           % os.path.join(self.currentFolder, self.file_list[self.current_song]),
                           "ERROR",
                           wx.ICON_ERROR | wx.OK)
-
-        if not self.mediaPlayer.Play():
-            wx.MessageBox("Unable to Play media : Unsupported format?",
-                          "ERROR",
-                          wx.ICON_ERROR | wx.OK)
-        else:
-            self.mediaPlayer.SetInitialSize()
-            self.GetSizer().Layout()
-            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
-            if self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
+        elif self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
                 self.songLabel.SetLabelText(self.file_list[self.current_song][:-4])
                 self.GetSizer().Layout()
 
@@ -431,22 +407,14 @@ class MediaPanel(wx.Panel):
             self.current_song = len(self.file_list) - 1
 
         self.mediaPlayer.Stop()
+        self.playPauseBtn.SetToggle(False)
 
         if not self.mediaPlayer.Load(os.path.join(self.currentFolder, self.file_list[self.current_song])):
             wx.MessageBox("Unable to load %s: Unsupported format?"
                           % os.path.join(self.currentFolder, self.file_list[self.current_song]),
                           "ERROR",
                           wx.ICON_ERROR | wx.OK)
-
-        if not self.mediaPlayer.Play():
-            wx.MessageBox("Unable to Play media : Unsupported format?",
-                          "ERROR",
-                          wx.ICON_ERROR | wx.OK)
-        else:
-            self.mediaPlayer.SetInitialSize()
-            self.GetSizer().Layout()
-            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
-            if self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
+        elif self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
                 self.songLabel.SetLabelText(self.file_list[self.current_song][:-4])
                 self.GetSizer().Layout()
 
