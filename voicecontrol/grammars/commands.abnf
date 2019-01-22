@@ -16,8 +16,10 @@ $command = (odtwarzaj | odtwórz | graj | puść | plej) {play} |
            (podgłośnij trochę | trochę głośniej |
             podgłośnij odrobinę | odrobinę głośniej) {volumeUpSlight} |
            (ścisz trochę | trochę ciszej |
-            ścisz odrobinę | odrobinę ciszej){volumeDownSlight} |
+            ścisz odrobinę | odrobinę ciszej) {volumeDownSlight} |
            (podgłośnij | głośniej) {volumeUp} |
            (ścisz | ciszej) {volumeDown} |
-           (losuj | wylosuj | losowo) {random};
+           (losuj | wylosuj | losowo) {random} |
+           (powtarzaj) {repeatOn} |
+           (przestań powtarzać) {repeatOff};
 

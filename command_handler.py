@@ -10,6 +10,8 @@ EventVNext, V_EVT_NEXT = NewEvent()
 EventVPrev, V_EVT_PREV = NewEvent()
 EventVRandomOff, V_EVT_RND_OFF = NewEvent()
 EventVRandomOn, V_EVT_RND_ON = NewEvent()
+EventVRepeatOff, V_EVT_RPT_OFF = NewEvent()
+EventVRepeatOn, V_EVT_RPT_ON = NewEvent()
 EventVVolChange, V_EVT_VOL = NewEvent()
 
 
@@ -38,6 +40,10 @@ class CommandHandlerThread(Thread):
             self.randomOff()
         elif command == 'randomOn':
             self.randomOn()
+        elif command == 'repeatOff':
+            self.repeatOff()
+        elif command == 'repeatOn':
+            self.repeatOn()
         elif command == 'volumeUpSlight':
             self.volumeChange(5)
         elif command == 'volumeDownSlight':
@@ -67,6 +73,12 @@ class CommandHandlerThread(Thread):
 
     def randomOn(self):
         wx.PostEvent(self.notify_window, EventVRandomOn())
+
+    def repeatOff(self):
+        wx.PostEvent(self.notify_window, EventVRepeatOff())
+
+    def repeatOn(self):
+        wx.PostEvent(self.notify_window, EventVRepeatOn())
 
     def volumeChange(self, offset):
         wx.PostEvent(self.notify_window, EventVVolChange(change=offset))

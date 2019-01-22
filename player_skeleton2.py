@@ -50,7 +50,10 @@ class MediaPanel(wx.Panel):
         self.Bind(V_EVT_PREV, self.onVoicePrev)
         self.Bind(V_EVT_RND_OFF, self.onVoiceRandomOff)
         self.Bind(V_EVT_RND_ON, self.onVoiceRandomOn)
+        self.Bind(V_EVT_RPT_OFF, self.onVoiceRepeatOff)
+        self.Bind(V_EVT_RPT_ON, self.onVoiceRepeatOn)
         self.Bind(V_EVT_VOL, self.onVoiceVolumeChange)
+
     #----------------------------------------------------------------------
     def layoutControls(self):
         """
@@ -377,6 +380,22 @@ class MediaPanel(wx.Panel):
         if not self.randomBtn.GetValue():
             random.shuffle(self.file_list)
             self.randomBtn.SetValue(True)
+
+    #----------------------------------------------------------------------
+    def onVoiceRepeatOff(self, event):
+        """
+        Sorts the playlist when command is received
+        """
+
+        self.repeatBtn.SetValue(False)
+
+    #----------------------------------------------------------------------
+    def onVoiceRepeatOn(self, event):
+        """
+        Sorts the playlist when command is received
+        """
+
+        self.repeatBtn.SetValue(True)
 
     #----------------------------------------------------------------------
     def onVoiceStop(self, event):
