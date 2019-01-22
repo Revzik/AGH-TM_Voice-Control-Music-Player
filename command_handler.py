@@ -13,7 +13,7 @@ EventVRandomOn, V_EVT_RND_ON = NewEvent()
 EventVRepeatOff, V_EVT_RPT_OFF = NewEvent()
 EventVRepeatOn, V_EVT_RPT_ON = NewEvent()
 EventVVolChange, V_EVT_VOL = NewEvent()
-
+EventVFinish, V_EVT_FINISH = NewEvent()
 
 class CommandHandlerThread(Thread):
 
@@ -52,6 +52,8 @@ class CommandHandlerThread(Thread):
             self.volumeChange(20)
         elif command == 'volumeDown':
             self.volumeChange(-20)
+        elif command == 'finish':
+            self.finish()
 
     def play(self):
         wx.PostEvent(self.notify_window, EventVPlay())
@@ -82,3 +84,6 @@ class CommandHandlerThread(Thread):
 
     def volumeChange(self, offset):
         wx.PostEvent(self.notify_window, EventVVolChange(change=offset))
+
+    def finish(self):
+        wx.PostEvent(self.notify_window, EventVFinish())

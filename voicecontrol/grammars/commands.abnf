@@ -20,5 +20,8 @@ $command = (odtwarzaj | odtwórz | graj | puść | plej) {play} |
            (podgłośnij | głośniej) {volumeUp} |
            (ścisz | ciszej) {volumeDown} |
            (powtarzaj) {repeatOn} |
-           (przestań powtarzać) {repeatOff};
+           (przestań powtarzać) {repeatOff} |
+           (zakończ | koniec | zamknij) {finish};
+
+
 

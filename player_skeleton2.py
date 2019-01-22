@@ -54,6 +54,7 @@ class MediaPanel(wx.Panel):
         self.Bind(V_EVT_RPT_OFF, self.onVoiceRepeatOff)
         self.Bind(V_EVT_RPT_ON, self.onVoiceRepeatOn)
         self.Bind(V_EVT_VOL, self.onVoiceVolumeChange)
+        self.Bind(V_EVT_FINISH, self.onVoiceFinish)
 
     #----------------------------------------------------------------------
     def layoutControls(self):
@@ -457,6 +458,9 @@ class MediaPanel(wx.Panel):
             self.currentVolume = 0
         self.mediaPlayer.SetVolume(self.currentVolume / 100)
         self.volumeCtrl.SetValue(self.currentVolume)
+
+    def onVoiceFinish(self, event):
+        self.Close()
 
 ########################################################################
 class MediaFrame(wx.Frame):
