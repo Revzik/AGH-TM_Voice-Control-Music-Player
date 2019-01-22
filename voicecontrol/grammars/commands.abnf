@@ -11,7 +11,7 @@ $command = (odtwarzaj | odtwórz | graj | puść | plej) {play} |
            (stop | wstrzymaj | wstrzymaj muzykę) {stop} |
            (następny | pomiń) {next} |
            (poprzedni | wróć | cofnij) {prev} |
-           (wyłącz losowanie) {randomOff} |
+           (wyłącz losowanie | losuj | losowo) {randomOff} |
            (włącz losowanie) {randomOn} |
            (podgłośnij trochę | trochę głośniej |
             podgłośnij odrobinę | odrobinę głośniej) {volumeUpSlight} |
@@ -19,7 +19,6 @@ $command = (odtwarzaj | odtwórz | graj | puść | plej) {play} |
             ścisz odrobinę | odrobinę ciszej) {volumeDownSlight} |
            (podgłośnij | głośniej) {volumeUp} |
            (ścisz | ciszej) {volumeDown} |
-           (losuj | wylosuj | losowo) {random} |
            (powtarzaj) {repeatOn} |
            (przestań powtarzać) {repeatOff};
 

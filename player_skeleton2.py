@@ -43,6 +43,7 @@ class MediaPanel(wx.Panel):
         self.commandHandler = CommandHandlerThread(self)
 
         self.Bind(wx.EVT_CHAR_HOOK, self.onKeyPress)
+
         self.Bind(V_EVT_PLAY, self.onVoicePlay)
         self.Bind(V_EVT_PAUSE, self.onVoicePause)
         self.Bind(V_EVT_STOP, self.onVoiceStop)
