@@ -51,7 +51,6 @@ class MediaPanel(wx.Panel):
         self.Bind(V_EVT_RND_OFF, self.onVoiceRandomOff)
         self.Bind(V_EVT_RND_ON, self.onVoiceRandomOn)
         self.Bind(V_EVT_VOL, self.onVoiceVolumeChange)
-        
     #----------------------------------------------------------------------
     def layoutControls(self):
         """
@@ -112,12 +111,21 @@ class MediaPanel(wx.Panel):
 
         self.randomBtn.Bind(wx.EVT_BUTTON, self.onRandomOn)
         audioBarSizer.Add(self.randomBtn, 0, wx.LEFT, 2)
+
+        img = wx.Bitmap(os.path.join(bitmapDir, "player_repeat.png"))
+        self.repeatBtn = buttons.GenBitmapToggleButton(self, bitmap=img, name="repeat")
+        self.repeatBtn.Enable(True)
+
+        img = wx.Bitmap(os.path.join(bitmapDir, "player_repeat.png"))
+        self.repeatBtn.SetBitmapSelected(img)
+        self.repeatBtn.SetInitialSize()
+        audioBarSizer.Add(self.repeatBtn, 0, wx.LEFT, 2)
         
         # create play/pause toggle button
         img = wx.Bitmap(os.path.join(bitmapDir, "player_play.png"))
         self.playPauseBtn = buttons.GenBitmapToggleButton(self, bitmap=img, name="play")
         self.playPauseBtn.Enable(False)
-        
+
         img = wx.Bitmap(os.path.join(bitmapDir, "player_pause.png"))
         self.playPauseBtn.SetBitmapSelected(img)
         self.playPauseBtn.SetInitialSize()
@@ -200,9 +208,10 @@ class MediaPanel(wx.Panel):
         """
         Switch to the next song in a folder (needs to be manually restarted)
         """
-        self.current_song = self.current_song + 1
-        if self.current_song >= len(self.file_list):
-            self.current_song = 0
+        if not self.repeatBtn.GetValue():
+            self.current_song = self.current_song + 1
+            if self.current_song >= len(self.file_list):
+                self.current_song = 0
 
         self.mediaPlayer.Stop()
         self.playPauseBtn.SetToggle(False)
@@ -240,17 +249,18 @@ class MediaPanel(wx.Panel):
             self.mediaPlayer.SetInitialSize()
             self.GetSizer().Layout()
             self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
-            
-        event.Skip()
-    
+            if self.playbackSlider.Position == self.mediaPlayer.Length():
+                self.current_song = self.current_song + 1
+
     #----------------------------------------------------------------------
     def onPrev(self, event):
         """
         Switch to previous song in a folder (needs to be manually restarted)
         """
-        self.current_song = self.current_song - 1
-        if self.current_song < 0:
-            self.current_song = len(self.file_list) - 1
+        if not self.repeatBtn.GetValue():
+            self.current_song = self.current_song - 1
+            if self.current_song < 0:
+                self.current_song = len(self.file_list) - 1
 
         self.mediaPlayer.Stop()
         self.playPauseBtn.SetToggle(False)
