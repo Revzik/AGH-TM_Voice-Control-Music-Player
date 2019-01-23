@@ -55,6 +55,7 @@ class MediaPanel(wx.Panel):
         self.Bind(V_EVT_RPT_ON, self.onVoiceRepeatOn)
         self.Bind(V_EVT_VOL, self.onVoiceVolumeChange)
         self.Bind(V_EVT_FINISH, self.onVoiceFinish)
+        self.Bind(V_EVT_MES, self.onVoiceMessage)
 
     #----------------------------------------------------------------------
     def layoutControls(self):
@@ -71,6 +72,9 @@ class MediaPanel(wx.Panel):
         # create song label
         self.songLabel = wx.StaticText(self, style=wx.ALIGN_CENTER)
 
+        # create dialog box
+        self.dialogText = wx.StaticText(self, style=wx.ALIGN_CENTER)
+
         # create playback slider
         self.playbackSlider = wx.Slider(self, size=wx.DefaultSize)
         self.Bind(wx.EVT_SLIDER, self.onSeek, self.playbackSlider)
@@ -79,19 +83,33 @@ class MediaPanel(wx.Panel):
         self.volumeCtrl.SetRange(0, 100)
         self.volumeCtrl.SetValue(self.currentVolume)
         self.volumeCtrl.Bind(wx.EVT_SLIDER, self.onSetVolume)
-                
+
+
         # Create sizers
         mainSizer = wx.BoxSizer(wx.VERTICAL)
         hSizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        # Create control sizer
         audioSizer = self.buildAudioBar()
-                
-        # layout widgets
-        mainSizer.Add(self.songLabel, 1, wx.ALL|wx.EXPAND, 5)
-        mainSizer.Add(self.playbackSlider, 1, wx.ALL|wx.EXPAND, 5)
         hSizer.Add(audioSizer, 0, wx.LEFT|wx.CENTER, 5)
-        hSizer.Add(self.volumeCtrl, 0, wx.RIGHT, 5)
+
+        volumeSizer = wx.BoxSizer(wx.VERTICAL)
+        label = wx.StaticText(self, style=wx.ALIGN_CENTER)
+        label.SetLabelText("Volume")
+        volumeSizer.Add(label, 0, wx.CENTER, 3)
+        volumeSizer.Add(self.volumeCtrl, 0, wx.CENTER, 3)
+
+        hSizer.Add(25, 0, 0)
+        hSizer.Add(volumeSizer, 0, wx.RIGHT, 5)
+
+        # layout widgets
+        mainSizer.Add(self.songLabel, 0, wx.ALL|wx.EXPAND, 5)
+        mainSizer.Add(self.playbackSlider, 0, wx.ALL|wx.EXPAND, 5)
+        mainSizer.Add(wx.StaticLine(self, 0, style=wx.LI_HORIZONTAL), 0, wx.ALL|wx.EXPAND, 5)
+        mainSizer.Add(self.dialogText, 0, wx.ALL|wx.EXPAND, 5)
+        mainSizer.Add(wx.StaticLine(self, 0, style=wx.LI_HORIZONTAL), 0, wx.ALL|wx.EXPAND, 5)
         mainSizer.Add(hSizer)
-        
+
         self.SetSizer(mainSizer)
         self.Layout()
         
@@ -102,34 +120,37 @@ class MediaPanel(wx.Panel):
         """
         audioBarSizer = wx.BoxSizer(wx.HORIZONTAL)
         
-        self.buildBtn({'bitmap':'player_prev.png', 'handler':self.onPrev,
-                       'name':'prev'},
+        self.buildBtn({'bitmap': 'player_prev.png', 'handler': self.onPrev,
+                       'name': 'prev'},
                       audioBarSizer)
 
         img = wx.Bitmap(os.path.join(bitmapDir, "player_random.png"))
         self.randomBtn = buttons.GenBitmapToggleButton(self, bitmap=img, name="random")
         self.randomBtn.Enable(True)
+        self.randomBtn.SetBackgroundColour('white')
 
         img = wx.Bitmap(os.path.join(bitmapDir, "player_random.png"))
         self.randomBtn.SetBitmapSelected(img)
         self.randomBtn.SetInitialSize()
 
         self.randomBtn.Bind(wx.EVT_BUTTON, self.onRandomOn)
-        audioBarSizer.Add(self.randomBtn, 0, wx.LEFT, 2)
+        audioBarSizer.Add(self.randomBtn, 0, wx.LEFT, 3)
 
         img = wx.Bitmap(os.path.join(bitmapDir, "player_repeat.png"))
         self.repeatBtn = buttons.GenBitmapToggleButton(self, bitmap=img, name="repeat")
         self.repeatBtn.Enable(True)
+        self.repeatBtn.SetBackgroundColour('white')
 
         img = wx.Bitmap(os.path.join(bitmapDir, "player_repeat.png"))
         self.repeatBtn.SetBitmapSelected(img)
         self.repeatBtn.SetInitialSize()
-        audioBarSizer.Add(self.repeatBtn, 0, wx.LEFT, 2)
+        audioBarSizer.Add(self.repeatBtn, 0, wx.LEFT, 3)
         
         # create play/pause toggle button
         img = wx.Bitmap(os.path.join(bitmapDir, "player_play.png"))
         self.playPauseBtn = buttons.GenBitmapToggleButton(self, bitmap=img, name="play")
         self.playPauseBtn.Enable(False)
+        self.playPauseBtn.SetBackgroundColour('white')
 
         img = wx.Bitmap(os.path.join(bitmapDir, "player_pause.png"))
         self.playPauseBtn.SetBitmapSelected(img)
@@ -155,6 +176,7 @@ class MediaPanel(wx.Panel):
                 
         img = wx.Bitmap(os.path.join(bitmapDir, bmp))
         btn = buttons.GenBitmapButton(self, bitmap=img, name=btnDict['name'])
+        btn.SetBackgroundColour('white')
         btn.SetInitialSize()
         btn.Bind(wx.EVT_BUTTON, handler)
         sizer.Add(btn, 0, wx.LEFT, 3)
@@ -208,27 +230,32 @@ class MediaPanel(wx.Panel):
 
         ddg.Destroy()
 
+        event.Skip()
+
     #----------------------------------------------------------------------
     def onNext(self, event):
         """
         Switch to the next song in a folder (needs to be manually restarted)
         """
-        if not self.repeatBtn.GetValue():
-            self.current_song = self.current_song + 1
-            if self.current_song >= len(self.file_list):
-                self.current_song = 0
+        if self.playPauseBtn.IsEnabled():
+            if not self.repeatBtn.GetValue():
+                self.current_song = self.current_song + 1
+                if self.current_song >= len(self.file_list):
+                    self.current_song = 0
 
-        self.mediaPlayer.Stop()
-        self.playPauseBtn.SetToggle(False)
+            self.mediaPlayer.Stop()
+            self.playPauseBtn.SetToggle(False)
 
-        if not self.mediaPlayer.Load(os.path.join(self.currentFolder, self.file_list[self.current_song])):
-            wx.MessageBox("Unable to load %s: Unsupported format?"
-                          % os.path.join(self.currentFolder, self.file_list[self.current_song]),
-                          "ERROR",
-                          wx.ICON_ERROR | wx.OK)
-        elif self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
-                self.songLabel.SetLabelText(self.file_list[self.current_song][:-4])
-                self.GetSizer().Layout()
+            if not self.mediaPlayer.Load(os.path.join(self.currentFolder, self.file_list[self.current_song])):
+                wx.MessageBox("Unable to load %s: Unsupported format?"
+                              % os.path.join(self.currentFolder, self.file_list[self.current_song]),
+                              "ERROR",
+                              wx.ICON_ERROR | wx.OK)
+            elif self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
+                    self.songLabel.SetLabelText(self.file_list[self.current_song][:-4])
+                    self.GetSizer().Layout()
+
+        event.Skip()
 
     #----------------------------------------------------------------------
     def onPause(self):
@@ -257,27 +284,32 @@ class MediaPanel(wx.Panel):
             if self.playbackSlider.Position == self.mediaPlayer.Length():
                 self.current_song = self.current_song + 1
 
+        event.Skip()
+
     #----------------------------------------------------------------------
     def onPrev(self, event):
         """
         Switch to previous song in a folder (needs to be manually restarted)
         """
-        if not self.repeatBtn.GetValue():
-            self.current_song = self.current_song - 1
-            if self.current_song < 0:
-                self.current_song = len(self.file_list) - 1
+        if self.playPauseBtn.IsEnabled():
+            if not self.repeatBtn.GetValue():
+                self.current_song = self.current_song - 1
+                if self.current_song < 0:
+                    self.current_song = len(self.file_list) - 1
 
-        self.mediaPlayer.Stop()
-        self.playPauseBtn.SetToggle(False)
+            self.mediaPlayer.Stop()
+            self.playPauseBtn.SetToggle(False)
 
-        if not self.mediaPlayer.Load(os.path.join(self.currentFolder, self.file_list[self.current_song])):
-            wx.MessageBox("Unable to load %s: Unsupported format?"
-                          % os.path.join(self.currentFolder, self.file_list[self.current_song]),
-                          "ERROR",
-                          wx.ICON_ERROR | wx.OK)
-        elif self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
-                self.songLabel.SetLabelText(self.file_list[self.current_song][:-4])
-                self.GetSizer().Layout()
+            if not self.mediaPlayer.Load(os.path.join(self.currentFolder, self.file_list[self.current_song])):
+                wx.MessageBox("Unable to load %s: Unsupported format?"
+                              % os.path.join(self.currentFolder, self.file_list[self.current_song]),
+                              "ERROR",
+                              wx.ICON_ERROR | wx.OK)
+            elif self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
+                    self.songLabel.SetLabelText(self.file_list[self.current_song][:-4])
+                    self.GetSizer().Layout()
+
+        event.Skip()
 
     #----------------------------------------------------------------------
     def onRandomOff(self):
@@ -298,6 +330,8 @@ class MediaPanel(wx.Panel):
 
         random.shuffle(self.file_list)
 
+        event.Skip()
+
     #----------------------------------------------------------------------
     def onSeek(self, event):
         """
@@ -306,6 +340,8 @@ class MediaPanel(wx.Panel):
         """
         offset = self.playbackSlider.GetValue()
         self.mediaPlayer.Seek(offset)
+
+        event.Skip()
         
     #----------------------------------------------------------------------
     def onSetVolume(self, event):
@@ -314,6 +350,8 @@ class MediaPanel(wx.Panel):
         """
         self.currentVolume = self.volumeCtrl.GetValue()
         self.mediaPlayer.SetVolume(self.currentVolume / 100)
+
+        event.Skip()
     
     #----------------------------------------------------------------------
     def onStop(self, event):
@@ -322,6 +360,8 @@ class MediaPanel(wx.Panel):
         """
         self.mediaPlayer.Stop()
         self.playPauseBtn.SetToggle(False)
+
+        event.Skip()
         
     #----------------------------------------------------------------------
     def onTimer(self, event):
@@ -330,6 +370,8 @@ class MediaPanel(wx.Panel):
         """
         offset = self.mediaPlayer.Tell()
         self.playbackSlider.SetValue(offset)
+
+        event.Skip()
 
     #----------------------Voice controll handlers-------------------------
     def onKeyPress(self, event):
@@ -347,23 +389,37 @@ class MediaPanel(wx.Panel):
         """
         Play the song when command is received
         """
-        if not self.mediaPlayer.Play():
-            wx.MessageBox("Unable to Play media : Unsupported format?",
-                          "ERROR",
-                          wx.ICON_ERROR | wx.OK)
+        if self.playPauseBtn.IsEnabled():
+            if not self.mediaPlayer.Play():
+                wx.MessageBox("Unable to Play media : Unsupported format?",
+                              "ERROR",
+                              wx.ICON_ERROR | wx.OK)
+            else:
+                self.mediaPlayer.SetInitialSize()
+                self.GetSizer().Layout()
+                self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
+                self.playPauseBtn.SetToggle(True)
+                self.dialogText.SetLabelText("Odtwarzanie")
         else:
-            self.mediaPlayer.SetInitialSize()
-            self.GetSizer().Layout()
-            self.playbackSlider.SetRange(0, self.mediaPlayer.Length())
-            self.playPauseBtn.SetToggle(True)
+            self.dialogText.SetLabelText("Nie można odtworzyć utworu")
+
+        self.GetSizer().Layout()
+
+        event.Skip()
 
     #----------------------------------------------------------------------
     def onVoicePause(self, event):
         """
         Pause current song when command is received
         """
-        self.mediaPlayer.Pause()
-        self.playPauseBtn.SetToggle(False)
+        if self.playPauseBtn.GetValue():
+            self.mediaPlayer.Pause()
+            self.playPauseBtn.SetToggle(False)
+
+        self.dialogText.SetLabelText("Odtwarzanie wstrzymane")
+        self.GetSizer().Layout()
+
+        event.Skip()
 
     #----------------------------------------------------------------------
     def onVoiceRandomOff(self, event):
@@ -374,6 +430,11 @@ class MediaPanel(wx.Panel):
             self.file_list = sorted(self.file_list)
             self.randomBtn.SetValue(False)
 
+        self.dialogText.SetLabelText("Losowanie wyłączone")
+        self.GetSizer().Layout()
+
+        event.Skip()
+
     #----------------------------------------------------------------------
     def onVoiceRandomOn(self, event):
         """
@@ -383,6 +444,11 @@ class MediaPanel(wx.Panel):
             random.shuffle(self.file_list)
             self.randomBtn.SetValue(True)
 
+        self.dialogText.SetLabelText("Losowanie włączone")
+        self.GetSizer().Layout()
+
+        event.Skip()
+
     #----------------------------------------------------------------------
     def onVoiceRepeatOff(self, event):
         """
@@ -390,6 +456,10 @@ class MediaPanel(wx.Panel):
         """
 
         self.repeatBtn.SetValue(False)
+        self.dialogText.SetLabelText("Powtarzanie utworu wyłączone")
+        self.GetSizer().Layout()
+
+        event.Skip()
 
     #----------------------------------------------------------------------
     def onVoiceRepeatOn(self, event):
@@ -398,6 +468,10 @@ class MediaPanel(wx.Panel):
         """
 
         self.repeatBtn.SetValue(True)
+        self.dialogText.SetLabelText("Powtarzanie utworu włączone")
+        self.GetSizer().Layout()
+
+        event.Skip()
 
     #----------------------------------------------------------------------
     def onVoiceStop(self, event):
@@ -406,61 +480,98 @@ class MediaPanel(wx.Panel):
         """
         self.mediaPlayer.Stop()
         self.playPauseBtn.SetToggle(False)
+        self.dialogText.SetLabelText("Odtwarzanie zatrzymane")
+        self.GetSizer().Layout()
+
+        event.Skip()
 
     #----------------------------------------------------------------------
     def onVoiceNext(self, event):
         """
         Switch to the next song in a folder when command is received (needs to be manually restarted)
         """
-        self.current_song = self.current_song + 1
-        if self.current_song >= len(self.file_list):
-            self.current_song = 0
+        if self.playPauseBtn.IsEnabled():
+            if not self.repeatBtn.GetValue():
+                self.current_song = self.current_song + 1
+                if self.current_song >= len(self.file_list):
+                    self.current_song = 0
 
-        self.mediaPlayer.Stop()
-        self.playPauseBtn.SetToggle(False)
+            self.mediaPlayer.Stop()
+            self.playPauseBtn.SetToggle(False)
 
-        if not self.mediaPlayer.Load(os.path.join(self.currentFolder, self.file_list[self.current_song])):
-            wx.MessageBox("Unable to load %s: Unsupported format?"
-                          % os.path.join(self.currentFolder, self.file_list[self.current_song]),
-                          "ERROR",
-                          wx.ICON_ERROR | wx.OK)
-        elif self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
-                self.songLabel.SetLabelText(self.file_list[self.current_song][:-4])
-                self.GetSizer().Layout()
+            if not self.mediaPlayer.Load(os.path.join(self.currentFolder, self.file_list[self.current_song])):
+                wx.MessageBox("Unable to load %s: Unsupported format?"
+                              % os.path.join(self.currentFolder, self.file_list[self.current_song]),
+                              "ERROR",
+                              wx.ICON_ERROR | wx.OK)
+            elif self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
+                    self.songLabel.SetLabelText(self.file_list[self.current_song][:-4])
+                    self.dialogText.SetLabelText("Utwór pominięty")
+                    self.GetSizer().Layout()
+        else:
+            self.dialogText.SetLabelText("Nie można pominąć")
+            self.GetSizer().Layout()
+
+        event.Skip()
 
     # ----------------------------------------------------------------------
     def onVoicePrev(self, event):
         """
         Switch to previous song in a folder when command is received (needs to be manually restarted)
         """
-        self.current_song = self.current_song - 1
-        if self.current_song < 0:
-            self.current_song = len(self.file_list) - 1
+        if self.playPauseBtn.IsEnabled():
+            if not self.repeatBtn.GetValue():
+                self.current_song = self.current_song - 1
+                if self.current_song < 0:
+                    self.current_song = len(self.file_list) - 1
 
-        self.mediaPlayer.Stop()
-        self.playPauseBtn.SetToggle(False)
+            self.mediaPlayer.Stop()
+            self.playPauseBtn.SetToggle(False)
 
-        if not self.mediaPlayer.Load(os.path.join(self.currentFolder, self.file_list[self.current_song])):
-            wx.MessageBox("Unable to load %s: Unsupported format?"
-                          % os.path.join(self.currentFolder, self.file_list[self.current_song]),
-                          "ERROR",
-                          wx.ICON_ERROR | wx.OK)
-        elif self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
-                self.songLabel.SetLabelText(self.file_list[self.current_song][:-4])
-                self.GetSizer().Layout()
+            if not self.mediaPlayer.Load(os.path.join(self.currentFolder, self.file_list[self.current_song])):
+                wx.MessageBox("Unable to load %s: Unsupported format?"
+                              % os.path.join(self.currentFolder, self.file_list[self.current_song]),
+                              "ERROR",
+                              wx.ICON_ERROR | wx.OK)
+            elif self.file_list[self.current_song].endswith('.mp3') or self.file_list[self.current_song].endswith('.wav'):
+                    self.songLabel.SetLabelText(self.file_list[self.current_song][:-4])
+                    self.dialogText.SetLabelText("Utwór pominięty")
+                    self.GetSizer().Layout()
+        else:
+            self.dialogText.SetLabelText("Nie można pominąć")
+            self.GetSizer().Layout()
+
+        event.Skip()
 
     #----------------------------------------------------------------------
     def onVoiceVolumeChange(self, event):
+        if event.change > 0:
+            self.dialogText.SetLabelText("Podgłośniono")
+        else:
+            self.dialogText.SetLabelText("Ścizsono")
+
         self.currentVolume += event.change
         if self.currentVolume > 100:
             self.currentVolume = 100
+            self.dialogText.SetLabelText("Głośność maksymalna")
         elif self.currentVolume < 0:
             self.currentVolume = 0
+            self.dialogText.SetLabelText("Wyciszono")
         self.mediaPlayer.SetVolume(self.currentVolume / 100)
         self.volumeCtrl.SetValue(self.currentVolume)
+        self.GetSizer().Layout()
 
+    #----------------------------------------------------------------------
+    def onVoiceMessage(self, event):
+        self.dialogText.SetLabelText(event.message)
+        self.GetSizer().Layout()
+
+    #----------------------------------------------------------------------
     def onVoiceFinish(self, event):
+        self.commandHandler.stop()
         self.Close()
+
+        event.Skip()
 
 ########################################################################
 class MediaFrame(wx.Frame):
@@ -468,7 +579,10 @@ class MediaFrame(wx.Frame):
     #----------------------------------------------------------------------
     def __init__(self):
         wx.Frame.__init__(self, None, wx.ID_ANY, "Python Music Player")
-        panel = MediaPanel(self)
+        self.panel = MediaPanel(self)
+        self.SetBackgroundColour('white')
+        self.SetMinSize(self.GetSize())
+        self.SetMaxSize(self.GetSize())
         
 #----------------------------------------------------------------------
 # Run the program

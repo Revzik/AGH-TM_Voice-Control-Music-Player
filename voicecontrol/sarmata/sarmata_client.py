@@ -4,7 +4,7 @@
 from argparse import ArgumentParser
 from .service.sarmata_settings import SarmataSettings
 from .service.sarmata_recognize import SarmataRecognizer
-from .service.sarmata_asr_pb2 import ResponseStatus, EMPTY, START_OF_INPUT
+from .service.sarmata_asr_pb2 import ResponseStatus, EMPTY, START_OF_INPUT, NO_MATCH, NO_INPUT_TIMEOUT
 from .utils.audio_source import AudioStream
 from .utils.mic_source import MicrophoneStream
 import sys
@@ -21,7 +21,7 @@ def print_results(responses, stream):
             print("Empty results - skipping response")
             continue
 
-        print("Received response with status: {}".format(ResponseStatus.Name(response.status)))
+        # print("Received response with status: {}".format(ResponseStatus.Name(response.status)))
 
         if response.error:
             print("[ERROR]: {}".format(response.error))
@@ -34,12 +34,12 @@ def print_results(responses, stream):
         if processing_completed:
             stream.close()
 
-        n = 1
+        if response.status == NO_INPUT_TIMEOUT or response.status == NO_MATCH:
+            return "", "{}".format(ResponseStatus.Name(response.status))
+
         for res in response.results:
             transcript = " ".join([word.transcript for word in res.words])
-            return res.semantic_interpretation
-            print("[{}.] {} /{}/ ({})".format(n, transcript, res.semantic_interpretation, res.confidence))
-            n += 1
+            return res.semantic_interpretation, "{}".format(ResponseStatus.Name(response.status))
 
 
 def validate_recognition_settings(settings):

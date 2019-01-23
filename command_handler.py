@@ -14,6 +14,7 @@ EventVRepeatOff, V_EVT_RPT_OFF = NewEvent()
 EventVRepeatOn, V_EVT_RPT_ON = NewEvent()
 EventVVolChange, V_EVT_VOL = NewEvent()
 EventVFinish, V_EVT_FINISH = NewEvent()
+EventVMessage, V_EVT_MES = NewEvent()
 
 class CommandHandlerThread(Thread):
 
@@ -22,38 +23,53 @@ class CommandHandlerThread(Thread):
         self.notify_window = notify_window
         self.start()
 
-    def recognize(self):
-        self.execute(runSarmata())
+    def stop(self):
+        self._is_running = False
 
-    def execute(self, command):
-        if command == 'play':
-            self.play()
-        elif command == 'pause':
-            self.pause()
-        elif command == 'stop':
-            self.stop()
-        elif command == 'next':
-            self.next()
-        elif command == 'prev':
-            self.prev()
-        elif command == 'randomOff':
-            self.randomOff()
-        elif command == 'randomOn':
-            self.randomOn()
-        elif command == 'repeatOff':
-            self.repeatOff()
-        elif command == 'repeatOn':
-            self.repeatOn()
-        elif command == 'volumeUpSlight':
-            self.volumeChange(5)
-        elif command == 'volumeDownSlight':
-            self.volumeChange(-5)
-        elif command == 'volumeUp':
-            self.volumeChange(20)
-        elif command == 'volumeDown':
-            self.volumeChange(-20)
-        elif command == 'finish':
-            self.finish()
+    def recognize(self):
+        command, status = runSarmata()
+        self.execute(command, status)
+
+    def execute(self, command, status):
+        if status == 'SUCCESS':
+            if command == 'play':
+                self.play()
+            elif command == 'pause':
+                self.pause()
+            elif command == 'stop':
+                self.stop()
+            elif command == 'next':
+                self.next()
+            elif command == 'prev':
+                self.prev()
+            elif command == 'randomOff':
+                self.randomOff()
+            elif command == 'randomOn':
+                self.randomOn()
+            elif command == 'repeatOff':
+                self.repeatOff()
+            elif command == 'repeatOn':
+                self.repeatOn()
+            elif command == 'volumeUpSlight':
+                self.volumeChange(5)
+            elif command == 'volumeDownSlight':
+                self.volumeChange(-5)
+            elif command == 'volumeUp':
+                self.volumeChange(20)
+            elif command == 'volumeDown':
+                self.volumeChange(-20)
+            elif command == 'finish':
+                self.finish()
+        elif status == "NO_INPUT_TIMEOUT":
+            self.noInput()
+        elif status == "NO_MATCH":
+            self.noMatch()
+
+    def noInput(self):
+        wx.PostEvent(self.notify_window, EventVMessage(message="Nie wykryto mowy"))
+
+    def noMatch(self):
+        wx.PostEvent(self.notify_window, EventVMessage(message="Nie zrozumiano polecenia"))
 
     def play(self):
         wx.PostEvent(self.notify_window, EventVPlay())
